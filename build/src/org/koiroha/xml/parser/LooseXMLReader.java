@@ -308,9 +308,10 @@ public class LooseXMLReader extends AbstractXMLReader{
 		String trailing = "-->";
 
 		// コメントの開始を通知
+		LexicalHandler lh = getLexicalHandler();
 		in.skipSequence(heading, true);
-		if(getLexicalHandler() instanceof BuilderLexicalHandler){
-			((BuilderLexicalHandler)getLexicalHandler()).startComment();
+		if(lh instanceof BuilderLexicalHandler){
+			((BuilderLexicalHandler)lh).startComment();
 		}
 
 		// コメントの読み出しと通知
@@ -329,7 +330,9 @@ public class LooseXMLReader extends AbstractXMLReader{
 			for(int offset=0; offset<cmt.length(); offset+=buffer.length){
 				int len = Math.min(buffer.length, cmt.length() - offset);
 				cmt.getChars(offset, offset + len, buffer, 0);
-				getLexicalHandler().comment(buffer, 0, len);
+				if(lh != null){
+					lh.comment(buffer, 0, len);
+				}
 			}
 
 			// コメント内の "--" をチェック
@@ -345,8 +348,8 @@ public class LooseXMLReader extends AbstractXMLReader{
 		}
 
 		// コメントの終了を通知
-		if(getLexicalHandler() instanceof BuilderLexicalHandler){
-			((BuilderLexicalHandler)getLexicalHandler()).endComment();
+		if(lh instanceof BuilderLexicalHandler){
+			((BuilderLexicalHandler)lh).endComment();
 		}
 		in.skipSequence(trailing, false);
 		return;
@@ -744,7 +747,7 @@ public class LooseXMLReader extends AbstractXMLReader{
 	 * <p>
 	 * @param text HTML 文字列
 	 * @return Unicode 文字列
-	 * @throws SAXException ハンドラによって中断された場合
+	 * @throws SAXException ハンドラによって井中断された場合
 	 * @throws IOException
 	 */
 	private String parseEntityReference(String text) throws SAXException, IOException{
