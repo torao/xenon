@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html-parse-spec [
+	<!ENTITY cr "&#x0D;">
+	<!ENTITY lf "&#x0A;">
+	<!ENTITY crlf "&#x0D;&#x0A;">
+	<!ENTITY ht "	">
+]>
+<section id="prologue">
+	<title>プロローグ/エピローグ</title>
+	<spec>
+		<title>ドキュメント開始前のテキスト</title>
+		<desc>先行する空白文字シーケンスを除き暗黙的にhtml要素内に移動</desc>
+		<expected><![CDATA[<html>あいうえお かきくけこ]]>&lf;<![CDATA[さしすせそ</html>]]></expected>
+		<sample>&ht; あいうえお かきくけこ&lf;<![CDATA[<html>さしすせそ</html>]]></sample>
+	</spec>
+	<spec>
+		<title>ドキュメント終了後のテキスト</title>
+		<desc>最後尾の空白文字シーケンスを除きhtml要素内に包含</desc>
+		<expected><![CDATA[<html>]]>あいうえお&ht;かきくけこ&lf;さしすせそ<![CDATA[</html>]]></expected>
+		<sample><![CDATA[<html>あいうえお</html>]]>&ht;かきくけこ&lf;さしすせそ&lf;  </sample>
+	</spec>
+	<spec>
+		<title>XML宣言</title>
+		<desc>XMLReaderプロパティとLocator2へ設定</desc>
+		<expected><![CDATA[<html>あいうえお</html>]]></expected>
+		<sample><![CDATA[<?xml?>]]>&#x0a;<![CDATA[<html>あいうえお</html>]]></sample>
+	</spec>
+	<spec>
+		<title>XML宣言</title>
+		<desc>XMLReaderプロパティとLocator2へ設定</desc>
+		<expected><![CDATA[<html>あいうえお</html>]]></expected>
+		<sample><![CDATA[<?xml ?>]]>&#x0a;<![CDATA[<html>あいうえお</html>]]></sample>
+	</spec>
+	<spec>
+		<title>バージョン指定のXML宣言</title>
+		<desc>XMLReaderプロパティとLocator2へ設定</desc>
+		<expected><![CDATA[<html>あいうえお</html>]]></expected>
+		<sample><![CDATA[<?xml version="1.0"?>]]>&#x0a;<![CDATA[<html>あいうえお</html>]]></sample>
+	</spec>
+	<spec>
+		<title>XML宣言</title>
+		<desc>XMLReaderプロパティとLocator2へ設定</desc>
+		<expected><![CDATA[<html>あいうえお</html>]]></expected>
+		<sample><![CDATA[<?xml version="1.0" encoding="UTF-8"?>]]>&#x0a;<![CDATA[<html>あいうえお</html>]]></sample>
+	</spec>
+	<spec>
+		<title>エンコーディング指定のXML宣言</title>
+		<desc>XMLReaderプロパティとLocator2へ設定</desc>
+		<expected><![CDATA[<html>あいうえお</html>]]></expected>
+		<sample><![CDATA[<?xml encoding="UTF-8"?>]]>&#x0a;<![CDATA[<html>あいうえお</html>]]></sample>
+	</spec>
+	<spec>
+		<title>未定義の属性の付属するXML宣言</title>
+		<desc>警告して無視</desc>
+		<error>X0001</error>
+		<expected><![CDATA[<html>あいうえお</html>]]></expected>
+		<sample><![CDATA[<?xml foo="bar"?>]]>&#x0a;<![CDATA[<html>あいうえお</html>]]></sample>
+	</spec>
+</section>

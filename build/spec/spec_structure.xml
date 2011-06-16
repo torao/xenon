@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section id="structure">
+	<title>ドキュメント構造</title>
+	<spec>
+		<title>階層構造のドキュメント</title>
+		<desc>XMLの階層構造として解釈</desc>
+		<expected><![CDATA[<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+	<title>タイトル</title>
+</head>
+<body>
+<h1>タイトル</h1>
+<p>
+<b style="font-family:sans-serif;">HTMLDocumentBuilderFactory</b> は XML に<i>厳格でない</i> HTML を解析して DOM を生成するための JAXP ドキュメントビルダーです。
+</p>
+</body>
+</html>]]></expected>
+		<sample><![CDATA[<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<title>タイトル</title>
+</head>
+<body>
+<h1>タイトル</h1>
+<p>
+<b style="font-family:sans-serif;">HTMLDocumentBuilderFactory</b> は XML に<i>厳格でない</i> HTML を解析して DOM を生成するための JAXP ドキュメントビルダーです。
+</p>
+</body>
+</html>]]></sample>
+	</spec>
+	<spec>
+		<title>HTML定義の空要素</title>
+		<desc>XMLの空要素と同等に解釈(ノードを内包する場合は不用な要素終了として警告)</desc>
+		<error>E0002</error>
+		<expected><![CDATA[<html>
+	<img src="foo.png"/>
+	<img src="foo.png"/>
+	<img src="foo.png"/>
+	<img src="foo.png"/>あいうえお
+</html>]]></expected>
+		<sample><![CDATA[<html>
+	<img src="foo.png">
+	<img src="foo.png" />
+	<img src="foo.png"></img>
+	<img src="foo.png">あいうえお</img>
+</html>]]></sample>
+	</spec>
+	<spec>
+		<title>li:閉じられていないリスティング要素</title>
+		<desc>強制的にolまたはul要素の直下へ移動(オプション動作)</desc>
+		<error>E0004, E0008</error>
+		<expected><![CDATA[<html>
+<body>
+<ol>
+<li>リスト1
+</li><li>リスト<b>2
+</b></li><li>リスト3</li>あ
+</ol>
+<b><li>何もしない</li></b>
+</body>
+</html>]]></expected>
+		<sample><![CDATA[<html>
+<body>
+<ol>
+<li>リスト1
+<li>リスト<b>2
+<li>リスト3</li>あ
+</ol>
+<b><li>何もしない</b>
+</body>
+</html>]]></sample>
+	</spec>
+	<spec>
+		<title>p:閉じられていないパラグラフ要素</title>
+		<desc>適切な位置へ移動(オプション動作)</desc>
+		<error>E0004, E0008</error>
+		<expected><![CDATA[<html>
+<body>
+<p>
+あいうえお
+</p><p>
+かきくけこ
+</p><p>
+さしすせそ
+</p></body>
+</html>]]></expected>
+		<sample><![CDATA[<html>
+<body>
+<p>
+あいうえお
+<p>
+かきくけこ
+<p>
+さしすせそ
+</body>
+</html>]]></sample>
+	</spec>
+</section>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html-parse-spec [
+	<!ENTITY cr "&#x0D;">
+	<!ENTITY lf "&#x0A;">
+	<!ENTITY crlf "&#x0D;&#x0A;">
+	<!ENTITY ht "	">
+]>
+<section id="entity-reference">
+	<title>実体参照の解釈</title>
+	<spec>
+		<title>HTML/XML共用の文字実体参照</title>
+		<desc>対応するUnicode文字として解釈</desc>
+		<expected><![CDATA[<html>&lt;&gt;&amp;&quot;</html>]]></expected>
+		<sample><![CDATA[<html>&lt;&gt;&amp;&quot;</html>]]></sample>
+	</spec>
+	<spec>
+		<title>HTML固有の文字実体参照</title>
+		<desc>対応するUnicode文字として解釈</desc>
+		<expected><![CDATA[<html>&#xA9;&#xA0;&#xAE;</html>]]></expected>
+		<sample><![CDATA[<html>&copy;&nbsp;&reg;</html>]]></sample>
+	</spec>
+	<spec>
+		<title>数値文字参照</title>
+		<desc>対応するUnicode文字として解釈</desc>
+		<expected><![CDATA[<html>[α][α][α]</html>]]></expected>
+		<sample><![CDATA[<html>[&#x03B1;][&#X03B1;][&#945;]</html>]]></sample>
+	</spec>
+	<spec>
+		<title>XML固有の文字実体参照</title>
+		<desc>テキストとして解釈</desc>
+		<error>T0100</error>
+		<expected><![CDATA[<html>&amp;apos;</html>]]></expected>
+		<sample><![CDATA[<html>&apos;</html>]]></sample>
+	</spec>
+	<spec>
+		<title>認識できない文字実体参照</title>
+		<desc>テキストとして解釈</desc>
+		<error>T0001,T0100</error>
+		<expected><![CDATA[<html>]]>&lf;&ht;<![CDATA[[&amp;foo;]]]>&lf;&ht;<![CDATA[[&amp;;]]]>&lf;&ht;<![CDATA[&amp;0123456789;]]>&lf;<![CDATA[</html>]]></expected>
+		<sample><![CDATA[<html>]]>&lf;&ht;<![CDATA[[&foo;]]]>&lf;&ht;<![CDATA[[&;]]]>&lf;&ht;<![CDATA[&0123456789;]]>&lf;<![CDATA[</html>]]></sample>
+	</spec>
+	<spec>
+		<title>認識できない数値文字参照</title>
+		<desc>テキストとして解釈</desc>
+		<error>T0100</error>
+		<expected><![CDATA[<html>[&amp;#;][&amp;#xyz;][&amp;#65536;][&amp;#x;][&amp;#xxyz;][&amp;#x10000;]</html>]]></expected>
+		<sample><![CDATA[<html>[&#;][&#xyz;][&#65536;][&#x;][&#xxyz;][&#x10000;]</html>]]></sample>
+	</spec>
+</section>

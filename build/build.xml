@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="all" basedir="..">
+	<property name="dir.temp"        value="build/tmp/" description="作業ディレクトリ" />
+	<property name="dir.dest"        value="dest/"      description="配布ディレクトリ" />
+	<property name="archive.id"      value="xmllib"     description="配布ファイルID" />
+	<property name="archive.version" value="1.0"        description="配布バージョン" />
+	<property name="archive.name"    value="${archive.id}_${archive.version}" />
+	<property name="javadoc.title"   value="XML Library 1.0" description="javadocタイトル" />
+	<property name="jdk.target"      value="1.5"        description="コンパイルバージョン" />
+	<!-- <property name="jdk.doclocation" value="http://java.sun.com/j2se/1.5.0/ja/docs/ja/api/" /> -->
+	<property name="jdk.doclocation" value="http://java.sun.com/javase/ja/6/docs/ja/api/" />
+
+	<target name="init">
+		<tstamp/>
+		<mkdir dir="${dir.dest}" />
+	</target>
+
+	<target name="make.library" depends="init" description="JARファイルの作成">
+
+		<!-- ビルド番号の生成とリソース保存 -->
+		<buildnumber file="build/build.number"/>
+		<concat destfile="build/src/org/koiroha/xml/build.properties">build=${DSTAMP}_${build.number}</concat>
+
+		<!-- コンパイルの実行とリソースのコピー -->
+		<mkdir dir="${dir.temp}" description="作業ディレクトリの作成"/>
+		<javac srcdir="build/src" destdir="${dir.temp}" encoding="UTF-8" target="${jdk.target}" debug="true" />
+		<copy todir="${dir.temp}">
+			<fileset dir="build/src">
+				<exclude name="**/*.java" />
+				<exclude name="**/*.properties" />
+			</fileset>
+		</copy>
+		<native2ascii src="build/src" dest="${dir.temp}" includes="**/*.properties" encoding="UTF-8" />
+
+		<!-- JAR ファイルの作成 -->
+		<jar jarfile="${dir.dest}/${archive.name}.jar">
+			<fileset dir="${dir.temp}" />
+			<manifest>
+				<attribute name="Created-By" value="takami torao" />
+				<attribute name="Implementation-Title" value="${archive.name}" />
+				<attribute name="Implementation-Version" value="${archive.version} build ${DSTAMP}_${build.number}" />
+			</manifest>
+		</jar>
+
+		<!-- 作業ディレクトリの削除 -->
+		<delete dir="${dir.temp}" />
+	</target>
+
+	<target name="make.source" depends="init" description="ソースZIPの作成">
+		<mkdir dir="${dir.temp}" description="作業ディレクトリの作成"/>
+		<copy todir="${dir.temp}">
+			<fileset dir="build/src" />
+		</copy>
+		<zip destfile="${dir.dest}/${archive.name}_src.zip">
+			<fileset dir="${dir.temp}" />
+		</zip>
+		<delete dir="${dir.temp}" />
+	</target>
+
+	<target name="make.javadoc" depends="init" description="APIリファレンスの作成">
+		<mkdir dir="${dir.dest}/doc/api/" />
+		<copy todir="${dir.dest}/doc/">
+			<fileset dir="build/doc/" />
+		</copy>
+		<javadoc destdir="${dir.dest}/doc/api/" docencoding="UTF-8" extdirs="build/lib" access="protected" author="yes" charset="UTF-8" doctitle="${javadoc.title}" encoding="UTF-8" use="true" windowtitle="${javadoc.title}">
+			<fileset dir="build/src/" includes="**/*.java"/>
+			<link href="${jdk.doclocation}" />
+			<header>${javadoc.title}</header>
+			<footer>koiroha.org by takami torao</footer>
+		</javadoc>
+		<zip destfile="${dir.dest}/${archive.name}_doc.zip">
+			<fileset dir="${dir.dest}/doc/" />
+		</zip>
+	</target>
+
+	<target name="all" depends="init, make.library, make.source, make.javadoc" description="配布用ZIPファイル作成">
+		<zip destfile="${dir.dest}/${archive.name}.zip">
+			<fileset file="${dir.dest}/${archive.name}.jar" />
+			<fileset file="${dir.dest}/${archive.name}_src.zip" />
+			<fileset file="${dir.dest}/${archive.name}_doc.zip" />
+		</zip>
+	</target>
+
+</project>

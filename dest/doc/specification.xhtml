@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>HTML Parser Specification</title>
+<style type="text/css">
+	.ctrl { width:8px; height:8px; }
+	.tab  { width:32px; height:8px; }
+	.smpl { font-size:11px; vertical-align:top; background-color:#F4F4F4; }
+	.titl { font-size:12px; font-family:sans-serif; padding-top:8px; border-bottom:solid 1px black; }
+	.desc { font-size:10px; }
+	.err  { font-family:sans-serif; color:red; }
+</style>
+</head>
+<body>
+<h2>プロローグ/エピローグ</h2>
+<table>
+<tr><td colspan="3" class="titl">●ドキュメント開始前のテキスト</td></tr>
+<tr><td colspan="3" class="desc">先行する空白文字シーケンスを除き暗黙的にhtml要素内に移動</td></tr>
+<tr>
+	<td class="smpl"><img src="ctrl/0c.png" alt="	" title="TAB" class="ctrl tab"/><img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>あいうえお<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>かきくけこ<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;html&gt;さしすせそ&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;あいうえお<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>かきくけこ<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>さしすせそ&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr class="odd"><td colspan="3" class="titl">●ドキュメント終了後のテキスト</td></tr>
+<tr class="odd"><td colspan="3" class="desc">最後尾の空白文字シーケンスを除きhtml要素内に包含</td></tr>
+<tr class="odd">
+	<td class="smpl">&lt;html&gt;あいうえお&lt;/html&gt;<img src="ctrl/0c.png" alt="	" title="TAB" class="ctrl tab"/>かきくけこ<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>さしすせそ<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/><img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/><img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/><img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;あいうえお<img src="ctrl/0c.png" alt="	" title="TAB" class="ctrl tab"/>かきくけこ<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>さしすせそ&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr><td colspan="3" class="titl">●XML宣言</td></tr>
+<tr><td colspan="3" class="desc">XMLReaderプロパティとLocator2へ設定</td></tr>
+<tr>
+	<td class="smpl">&lt;?xml?&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;html&gt;あいうえお&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;あいうえお&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr class="odd"><td colspan="3" class="titl">●XML宣言</td></tr>
+<tr class="odd"><td colspan="3" class="desc">XMLReaderプロパティとLocator2へ設定</td></tr>
+<tr class="odd">
+	<td class="smpl">&lt;?xml<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>?&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;html&gt;あいうえお&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;あいうえお&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr><td colspan="3" class="titl">●バージョン指定のXML宣言</td></tr>
+<tr><td colspan="3" class="desc">XMLReaderプロパティとLocator2へ設定</td></tr>
+<tr>
+	<td class="smpl">&lt;?xml<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>version=&quot;1.0&quot;?&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;html&gt;あいうえお&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;あいうえお&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr class="odd"><td colspan="3" class="titl">●XML宣言</td></tr>
+<tr class="odd"><td colspan="3" class="desc">XMLReaderプロパティとLocator2へ設定</td></tr>
+<tr class="odd">
+	<td class="smpl">&lt;?xml<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>version=&quot;1.0&quot;<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>encoding=&quot;UTF-8&quot;?&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;html&gt;あいうえお&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;あいうえお&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr><td colspan="3" class="titl">●エンコーディング指定のXML宣言</td></tr>
+<tr><td colspan="3" class="desc">XMLReaderプロパティとLocator2へ設定</td></tr>
+<tr>
+	<td class="smpl">&lt;?xml<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>encoding=&quot;UTF-8&quot;?&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;html&gt;あいうえお&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;あいうえお&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr class="odd"><td colspan="3" class="titl">○<i>未定義の属性の付属するXML宣言</i></td></tr>
+<tr class="odd"><td colspan="3" class="desc">警告して無視</td></tr>
+<tr class="odd">
+	<td class="smpl">&lt;?xml<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>foo=&quot;bar&quot;?&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;html&gt;あいうえお&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;あいうえお&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr class="odd"><td colspan="3" class="desc err"> 1, 1: X0001:未定義の XML 宣言属性です: foo=&quot;bar&quot;</td></tr>
+</table>
+<h2>要素</h2>
+<table>
+<tr><td colspan="3" class="titl">●子要素を内包しない要素</td></tr>
+<tr><td colspan="3" class="desc">空の要素として認識</td></tr>
+<tr>
+	<td class="smpl">&lt;html&gt;&lt;div&gt;&lt;/div&gt;&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;&lt;div/&gt;&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr class="odd"><td colspan="3" class="titl">●子要素を内包しない要素(簡略表記)</td></tr>
+<tr class="odd"><td colspan="3" class="desc">空の要素として認識</td></tr>
+<tr class="odd">
+	<td class="smpl">&lt;html&gt;&lt;div/&gt;&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;&lt;div/&gt;&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr><td colspan="3" class="titl">●要素内の意味を持たない空白文字</td></tr>
+<tr><td colspan="3" class="desc">無視</td></tr>
+<tr>
+	<td class="smpl">&lt;html<img src="ctrl/0c.png" alt="	" title="TAB" class="ctrl tab"/><img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/><img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/><img src="ctrl/0d.png" alt="" title="CR" class="ctrl"/><img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/><img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>/&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html/&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr class="odd"><td colspan="3" class="titl">○<i>使用していない要素終了</i></td></tr>
+<tr class="odd"><td colspan="3" class="desc">警告して無視</td></tr>
+<tr class="odd">
+	<td class="smpl">&lt;html&gt;あいう&lt;/b&gt;えお&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;あいうえお&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr class="odd"><td colspan="3" class="desc err"> 1,10: E0002:使用されていない要素の終了: &lt;/b&gt;</td></tr>
+<tr><td colspan="3" class="titl">○<i>要素の終了に属性を記述</i></td></tr>
+<tr><td colspan="3" class="desc">警告して無視</td></tr>
+<tr>
+	<td class="smpl">&lt;html&gt;あいうえお&lt;/html<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>class=&quot;foo&quot;&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;あいうえお&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr><td colspan="3" class="desc err"> 1,12: E0001:要素の終了で属性は指定できません: &lt;/html ...&gt;</td></tr>
+</table>
+<h2>テキストの解釈</h2>
+<table>
+<tr><td colspan="3" class="titl">●通常のテキスト</td></tr>
+<tr><td colspan="3" class="desc">テキストとして解釈</td></tr>
+<tr>
+	<td class="smpl">&lt;html&gt;あいうえお&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;あいうえお&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr class="odd"><td colspan="3" class="titl">●XML定義の空白文字</td></tr>
+<tr class="odd"><td colspan="3" class="desc">単体のCRは改行としてLFに変換</td></tr>
+<tr class="odd">
+	<td class="smpl">&lt;html&gt;[<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>][<img src="ctrl/0c.png" alt="	" title="TAB" class="ctrl tab"/>][<img src="ctrl/0d.png" alt="" title="CR" class="ctrl"/>][<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>]&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;[<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>][<img src="ctrl/0c.png" alt="	" title="TAB" class="ctrl tab"/>][<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>][<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>]&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr><td colspan="3" class="titl">●改行文字の扱い</td></tr>
+<tr><td colspan="3" class="desc">CRLF及び単体のCRはLFに変換</td></tr>
+<tr>
+	<td class="smpl">&lt;html&gt;[<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>][<img src="ctrl/0d.png" alt="" title="CR" class="ctrl"/><img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>][<img src="ctrl/0d.png" alt="" title="CR" class="ctrl"/>]&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;[<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>][<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>][<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>]&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr class="odd"><td colspan="3" class="titl">●要素に囲まれていないテキスト</td></tr>
+<tr class="odd"><td colspan="3" class="desc">暗黙的にHTML要素を開始</td></tr>
+<tr class="odd">
+	<td class="smpl">あいうえお<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;あいうえお&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr><td colspan="3" class="titl">●単体の'&lt;'</td></tr>
+<tr><td colspan="3" class="desc">テキストとして解釈</td></tr>
+<tr>
+	<td class="smpl">&lt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;&amp;lt;&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr class="odd"><td colspan="3" class="titl">○<i>単体の'&amp;'</i></td></tr>
+<tr class="odd"><td colspan="3" class="desc">テキストとして解釈</td></tr>
+<tr class="odd">
+	<td class="smpl">&lt;html&gt;&amp;&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;&amp;amp;&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr class="odd"><td colspan="3" class="desc err"> 1, 7: T0001:'&amp;' に続く実体参照名が指定されていません</td></tr>
+</table>
+<h2>実体参照の解釈</h2>
+<table>
+<tr><td colspan="3" class="titl">●HTML/XML共用の文字実体参照</td></tr>
+<tr><td colspan="3" class="desc">対応するUnicode文字として解釈</td></tr>
+<tr>
+	<td class="smpl">&lt;html&gt;&amp;lt;&amp;gt;&amp;amp;&amp;quot;&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;&amp;lt;&amp;gt;&amp;amp;&quot;&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr class="odd"><td colspan="3" class="titl">●HTML固有の文字実体参照</td></tr>
+<tr class="odd"><td colspan="3" class="desc">対応するUnicode文字として解釈</td></tr>
+<tr class="odd">
+	<td class="smpl">&lt;html&gt;&amp;copy;&amp;nbsp;&amp;reg;&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;© ®&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr><td colspan="3" class="titl">●数値文字参照</td></tr>
+<tr><td colspan="3" class="desc">対応するUnicode文字として解釈</td></tr>
+<tr>
+	<td class="smpl">&lt;html&gt;[&amp;#x03B1;][&amp;#X03B1;][&amp;#945;]&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;[α][α][α]&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr class="odd"><td colspan="3" class="titl">○<i>XML固有の文字実体参照</i></td></tr>
+<tr class="odd"><td colspan="3" class="desc">テキストとして解釈</td></tr>
+<tr class="odd">
+	<td class="smpl">&lt;html&gt;&amp;apos;&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;&amp;amp;apos;&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr class="odd"><td colspan="3" class="desc err"> 1, 7: T0100:実体参照 &quot;&amp;apos;&quot; は未定義です</td></tr>
+<tr><td colspan="3" class="titl">○<i>認識できない文字実体参照</i></td></tr>
+<tr><td colspan="3" class="desc">テキストとして解釈</td></tr>
+<tr>
+	<td class="smpl">&lt;html&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/><img src="ctrl/0c.png" alt="	" title="TAB" class="ctrl tab"/>[&amp;foo;]<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/><img src="ctrl/0c.png" alt="	" title="TAB" class="ctrl tab"/>[&amp;;]<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/><img src="ctrl/0c.png" alt="	" title="TAB" class="ctrl tab"/>&amp;0123456789;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/><img src="ctrl/0c.png" alt="	" title="TAB" class="ctrl tab"/>[&amp;amp;foo;]<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/><img src="ctrl/0c.png" alt="	" title="TAB" class="ctrl tab"/>[&amp;amp;;]<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/><img src="ctrl/0c.png" alt="	" title="TAB" class="ctrl tab"/>&amp;amp;0123456789;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr><td colspan="3" class="desc err"> 2, 3: T0100:実体参照 &quot;&amp;foo;&quot; は未定義です<br/> 3, 3: T0100:実体参照 &quot;&amp;;&quot; は未定義です<br/> 4, 2: T0001:'&amp;' に続く実体参照名が指定されていません</td></tr>
+<tr class="odd"><td colspan="3" class="titl">○<i>認識できない数値文字参照</i></td></tr>
+<tr class="odd"><td colspan="3" class="desc">テキストとして解釈</td></tr>
+<tr class="odd">
+	<td class="smpl">&lt;html&gt;[&amp;#;][&amp;#xyz;][&amp;#65536;][&amp;#x;][&amp;#xxyz;][&amp;#x10000;]&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;[&amp;amp;#;][&amp;amp;#xyz;][&amp;amp;#65536;][&amp;amp;#x;][&amp;amp;#xxyz;][&amp;amp;#x10000;]&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr class="odd"><td colspan="3" class="desc err"> 1, 8: T0100:実体参照 &quot;&amp;#;&quot; は未定義です<br/> 1,13: T0100:実体参照 &quot;&amp;#xyz;&quot; は未定義です<br/> 1,21: T0100:実体参照 &quot;&amp;#65536;&quot; は未定義です<br/> 1,31: T0100:実体参照 &quot;&amp;#x;&quot; は未定義です<br/> 1,37: T0100:実体参照 &quot;&amp;#xxyz;&quot; は未定義です<br/> 1,46: T0100:実体参照 &quot;&amp;#x10000;&quot; は未定義です</td></tr>
+</table>
+<h2>CDATAセクションの解釈</h2>
+<table>
+<tr><td colspan="3" class="titl">●通常のCDATAセクション</td></tr>
+<tr><td colspan="3" class="desc">エスケープされていないテキストとして解釈(改行のみ変換)</td></tr>
+<tr>
+	<td class="smpl">&lt;html&gt;&lt;![CDATA[<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/><img src="ctrl/0c.png" alt="	" title="TAB" class="ctrl tab"/>&lt;<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>&gt;<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>&amp;<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>&quot;<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/><img src="ctrl/0d.png" alt="" title="CR" class="ctrl"/><img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/><img src="ctrl/0d.png" alt="" title="CR" class="ctrl"/><img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>]]&gt;&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;&lt;![CDATA[<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/><img src="ctrl/0c.png" alt="	" title="TAB" class="ctrl tab"/>&lt;<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>&gt;<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>&amp;<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>&quot;<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/><img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/><img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/><img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>]]&gt;&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr class="odd"><td colspan="3" class="titl">●単体のCDATAセクション</td></tr>
+<tr class="odd"><td colspan="3" class="desc">暗黙的にhtml要素を開始</td></tr>
+<tr class="odd">
+	<td class="smpl">&lt;![CDATA[<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>ABC<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>]]&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;&lt;![CDATA[<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>ABC<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>]]&gt;&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr><td colspan="3" class="titl">●ドキュメント要素より前のCDATAセクション</td></tr>
+<tr><td colspan="3" class="desc">html要素内に内包</td></tr>
+<tr>
+	<td class="smpl"><img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>&lt;![CDATA[<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>あいうえお<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>]]&gt;<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>&lt;html&gt;かきくけこ&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;&lt;![CDATA[<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>あいうえお<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>]]&gt;<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>かきくけこ&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr class="odd"><td colspan="3" class="titl">●ドキュメント要素より後のCDATAセクション</td></tr>
+<tr class="odd"><td colspan="3" class="desc">html要素内に内包</td></tr>
+<tr class="odd">
+	<td class="smpl">&lt;html&gt;あいうえお&lt;/html&gt;<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>&lt;![CDATA[<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>かきくけこ<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>]]&gt;<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/><img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;あいうえお<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>&lt;![CDATA[<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>かきくけこ<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>]]&gt;&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+</table>
+<h2>コメントの解釈</h2>
+<table>
+<tr><td colspan="3" class="titl">●通常のコメント</td></tr>
+<tr><td colspan="3" class="desc">XMLのコメントとして解釈</td></tr>
+<tr>
+	<td class="smpl">&lt;html&gt;&lt;!--<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>コメント<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>--&gt;&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;&lt;!--<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>コメント<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>--&gt;&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr class="odd"><td colspan="3" class="titl">●空のコメント</td></tr>
+<tr class="odd"><td colspan="3" class="desc">XMLのコメントとして解釈</td></tr>
+<tr class="odd">
+	<td class="smpl">&lt;html&gt;&lt;!----&gt;&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;&lt;!----&gt;&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr><td colspan="3" class="titl">●ドキュメント要素より前のコメント</td></tr>
+<tr><td colspan="3" class="desc">XMLのコメントとして解釈</td></tr>
+<tr>
+	<td class="smpl">&lt;!--コメント--&gt;&lt;html/&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;!--コメント--&gt;&lt;html/&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr class="odd"><td colspan="3" class="titl">●ドキュメント要素より後のコメント</td></tr>
+<tr class="odd"><td colspan="3" class="desc">XMLのコメントとして解釈</td></tr>
+<tr class="odd">
+	<td class="smpl">&lt;html/&gt;&lt;!--コメント--&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html/&gt;&lt;!--コメント--&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr><td colspan="3" class="titl">○<i>連続したハイフンを内包するコメント</i></td></tr>
+<tr><td colspan="3" class="desc">そのままハンドラへ通知 (DOM実装で空白を挿入)</td></tr>
+<tr>
+	<td class="smpl">&lt;html&gt;&lt;!--<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>i--<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>--&gt;&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;&lt;!--<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>i-<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>-<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>--&gt;&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr><td colspan="3" class="desc err"> 1, 7: C0001:コメント内での文字列 &quot;--&quot; は許可されていません</td></tr>
+<tr class="odd"><td colspan="3" class="titl">○<i>ハイフンで終了するコメント</i></td></tr>
+<tr class="odd"><td colspan="3" class="desc">そのままハンドラへ通知 (DOM実装で空白を挿入)</td></tr>
+<tr class="odd">
+	<td class="smpl">&lt;html&gt;&lt;!-----&gt;&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;&lt;!---<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>--&gt;&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr class="odd"><td colspan="3" class="desc err"> 1, 7: C0001:コメント内での文字列 &quot;--&quot; は許可されていません</td></tr>
+</table>
+<h2>処理命令の解釈</h2>
+<table>
+<tr><td colspan="3" class="titl">●ドキュメント要素より前に記述された処理命令</td></tr>
+<tr><td colspan="3" class="desc">XMLの処理命令として解釈</td></tr>
+<tr>
+	<td class="smpl">&lt;?xml-stylesheet<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>type=&quot;text/xsl&quot;?&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;html/&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;?xml-stylesheet<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>type=&quot;text/xsl&quot;?&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;html/&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr class="odd"><td colspan="3" class="titl">●ドキュメント内に記述された処理命令</td></tr>
+<tr class="odd"><td colspan="3" class="desc">XMLの処理命令として解釈</td></tr>
+<tr class="odd">
+	<td class="smpl">&lt;html&gt;&lt;?xml-stylesheet<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>type=&quot;text/xsl&quot;?&gt;&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;&lt;?xml-stylesheet<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>type=&quot;text/xsl&quot;?&gt;&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr><td colspan="3" class="titl">●ドキュメント終了より後に記述された処理命令</td></tr>
+<tr><td colspan="3" class="desc">XMLの処理命令として解釈</td></tr>
+<tr>
+	<td class="smpl">&lt;html/&gt;&lt;?xml-stylesheet<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>type=&quot;text/xsl&quot;?&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html/&gt;&lt;?xml-stylesheet<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>type=&quot;text/xsl&quot;?&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/><img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr class="odd"><td colspan="3" class="titl">●処理命令内の記述</td></tr>
+<tr class="odd"><td colspan="3" class="desc">CR及びCRLFのみをLFに変換</td></tr>
+<tr class="odd">
+	<td class="smpl">&lt;html&gt;&lt;?foo<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/><img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>[<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/><img src="ctrl/0c.png" alt="	" title="TAB" class="ctrl tab"/>A<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/><img src="ctrl/0d.png" alt="" title="CR" class="ctrl"/>B<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/><img src="ctrl/0d.png" alt="" title="CR" class="ctrl"/><img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>C<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/><img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>D<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>&amp;amp;<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>]<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>?&gt;&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;&lt;?foo<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>[<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/><img src="ctrl/0c.png" alt="	" title="TAB" class="ctrl tab"/>A<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/><img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>B<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/><img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>C<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/><img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>D<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>&amp;amp;<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>]<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>?&gt;&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr><td colspan="3" class="titl">○<i>無効な処理命令のターゲット名</i></td></tr>
+<tr><td colspan="3" class="desc">警告して無視</td></tr>
+<tr>
+	<td class="smpl">&lt;html&gt;&lt;??&gt;&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html/&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr><td colspan="3" class="desc err"> 1, 7: P0001:ターゲット名が不正です: </td></tr>
+<tr class="odd"><td colspan="3" class="titl">○<i>無効な処理命令のターゲット名</i></td></tr>
+<tr class="odd"><td colspan="3" class="desc">警告して無視</td></tr>
+<tr class="odd">
+	<td class="smpl">&lt;html&gt;&lt;?<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>?&gt;&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html/&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr class="odd"><td colspan="3" class="desc err"> 1, 7: P0001:ターゲット名が不正です: </td></tr>
+<tr><td colspan="3" class="titl">○<i>無効な処理命令のターゲット名</i></td></tr>
+<tr><td colspan="3" class="desc">警告して無視</td></tr>
+<tr>
+	<td class="smpl">&lt;html&gt;&lt;?<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>foo=&quot;bar&quot;?&gt;&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html/&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr><td colspan="3" class="desc err"> 1, 7: P0001:ターゲット名が不正です: </td></tr>
+<tr class="odd"><td colspan="3" class="titl">○<i>無効な処理命令のターゲット名</i></td></tr>
+<tr class="odd"><td colspan="3" class="desc">警告して無視</td></tr>
+<tr class="odd">
+	<td class="smpl">&lt;html&gt;&lt;?--?&gt;&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html/&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr class="odd"><td colspan="3" class="desc err"> 1, 7: P0001:ターゲット名が不正です: --</td></tr>
+</table>
+<h2>ドキュメント宣言の解釈</h2>
+<table>
+<tr><td colspan="3" class="titl">●PUBLIC IDの記述(SYSTEM ID付属)</td></tr>
+<tr><td colspan="3" class="desc">DTDHandlerへ通知のみ</td></tr>
+<tr>
+	<td class="smpl">&lt;!DOCTYPE<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>html<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>PUBLIC<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>&quot;-//W3C//DTD<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>HTML<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>4.01//EN&quot;<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>&quot;http://www.w3.org/TR/html4/strict.dtd&quot;&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;html/&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html/&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr class="odd"><td colspan="3" class="titl">●PUBLIC IDの記述(SYSTEM ID省略)</td></tr>
+<tr class="odd"><td colspan="3" class="desc">DTDHandlerへ通知のみ</td></tr>
+<tr class="odd">
+	<td class="smpl">&lt;!DOCTYPE<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>html<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>PUBLIC<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>&quot;-//W3C//DTD<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>HTML<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>4.01//EN&quot;&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;html/&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html/&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr><td colspan="3" class="titl">●SYSTEM IDの記述</td></tr>
+<tr><td colspan="3" class="desc">DTDHandlerへ通知のみ</td></tr>
+<tr>
+	<td class="smpl">&lt;!DOCTYPE<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>html<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>SYSTEM<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>&quot;http://www.w3.org/TR/html4/strict.dtd&quot;&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;html/&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html/&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr class="odd"><td colspan="3" class="titl">●PUBLID ID/SYSTEM ID共に記述</td></tr>
+<tr class="odd"><td colspan="3" class="desc">DTDHandlerへ通知のみ</td></tr>
+<tr class="odd">
+	<td class="smpl">&lt;!DOCTYPE<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>html&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;html/&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html/&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr><td colspan="3" class="titl">●html以外のDTD</td></tr>
+<tr><td colspan="3" class="desc">DTDHandlerへ通知のみ</td></tr>
+<tr>
+	<td class="smpl">&lt;!DOCTYPE<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>xhtml<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>PUBLIC<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>&quot;-//W3C//DTD<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>HTML<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>4.01//EN&quot;<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>&quot;http://www.w3.org/TR/html4/strict.dtd&quot;&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;html/&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html/&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr class="odd"><td colspan="3" class="titl">○<i>認識できないDTD</i></td></tr>
+<tr class="odd"><td colspan="3" class="desc">無視</td></tr>
+<tr class="odd">
+	<td class="smpl">&lt;!DOCTYPE<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>html<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>PRIVATE<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>&quot;http://www.w3.org/TR/html4/strict.dtd&quot;&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;html/&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html/&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr class="odd"><td colspan="3" class="desc err"> 1, 1: D0001:ドキュメント型を認識できません: &lt;!DOCTYPE html PRIVATE &quot;http://www.w3.org/TR/html4/strict.dtd&quot;&gt;</td></tr>
+</table>
+<h2>ドキュメント構造</h2>
+<table>
+<tr><td colspan="3" class="titl">●階層構造のドキュメント</td></tr>
+<tr><td colspan="3" class="desc">XMLの階層構造として解釈</td></tr>
+<tr>
+	<td class="smpl">&lt;html&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;head&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/><img src="ctrl/0c.png" alt="	" title="TAB" class="ctrl tab"/>&lt;meta<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>http-equiv=&quot;Content-Type&quot;<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>content=&quot;text/html;charset=UTF-8&quot;&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/><img src="ctrl/0c.png" alt="	" title="TAB" class="ctrl tab"/>&lt;title&gt;タイトル&lt;/title&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;/head&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;body&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;h1&gt;タイトル&lt;/h1&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;p&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;b<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>style=&quot;font-family:sans-serif;&quot;&gt;HTMLDocumentBuilderFactory&lt;/b&gt;<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>は<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>XML<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>に&lt;i&gt;厳格でない&lt;/i&gt;<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>HTML<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>を解析して<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>DOM<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>を生成するための<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>JAXP<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>ドキュメントビルダーです。<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;/p&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;/body&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;head&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/><img src="ctrl/0c.png" alt="	" title="TAB" class="ctrl tab"/>&lt;meta<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>content=&quot;text/html;charset=UTF-8&quot;<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>http-equiv=&quot;Content-Type&quot;/&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/><img src="ctrl/0c.png" alt="	" title="TAB" class="ctrl tab"/>&lt;title&gt;タイトル&lt;/title&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;/head&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;body&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;h1&gt;タイトル&lt;/h1&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;p&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;b<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>style=&quot;font-family:sans-serif;&quot;&gt;HTMLDocumentBuilderFactory&lt;/b&gt;<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>は<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>XML<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>に&lt;i&gt;厳格でない&lt;/i&gt;<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>HTML<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>を解析して<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>DOM<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>を生成するための<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>JAXP<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>ドキュメントビルダーです。<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;/p&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;/body&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr class="odd"><td colspan="3" class="titl">○<i>HTML定義の空要素</i></td></tr>
+<tr class="odd"><td colspan="3" class="desc">XMLの空要素と同等に解釈(ノードを内包する場合は不用な要素終了として警告)</td></tr>
+<tr class="odd">
+	<td class="smpl">&lt;html&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/><img src="ctrl/0c.png" alt="	" title="TAB" class="ctrl tab"/>&lt;img<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>src=&quot;foo.png&quot;&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/><img src="ctrl/0c.png" alt="	" title="TAB" class="ctrl tab"/>&lt;img<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>src=&quot;foo.png&quot;<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>/&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/><img src="ctrl/0c.png" alt="	" title="TAB" class="ctrl tab"/>&lt;img<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>src=&quot;foo.png&quot;&gt;&lt;/img&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/><img src="ctrl/0c.png" alt="	" title="TAB" class="ctrl tab"/>&lt;img<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>src=&quot;foo.png&quot;&gt;あいうえお&lt;/img&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/><img src="ctrl/0c.png" alt="	" title="TAB" class="ctrl tab"/>&lt;img<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>src=&quot;foo.png&quot;/&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/><img src="ctrl/0c.png" alt="	" title="TAB" class="ctrl tab"/>&lt;img<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>src=&quot;foo.png&quot;/&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/><img src="ctrl/0c.png" alt="	" title="TAB" class="ctrl tab"/>&lt;img<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>src=&quot;foo.png&quot;/&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/><img src="ctrl/0c.png" alt="	" title="TAB" class="ctrl tab"/>&lt;img<img src="ctrl/20.png" alt=" " title="SPACE" class="ctrl"/>src=&quot;foo.png&quot;/&gt;あいうえお<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr class="odd"><td colspan="3" class="desc err"> 5,26: E0002:使用されていない要素の終了: &lt;/img&gt;</td></tr>
+<tr><td colspan="3" class="titl">○<i>li:閉じられていないリスティング要素</i></td></tr>
+<tr><td colspan="3" class="desc">強制的にolまたはul要素の直下へ移動(オプション動作)</td></tr>
+<tr>
+	<td class="smpl">&lt;html&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;body&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;ol&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;li&gt;リスト1<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;li&gt;リスト&lt;b&gt;2<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;li&gt;リスト3&lt;/li&gt;あ<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;/ol&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;b&gt;&lt;li&gt;何もしない&lt;/b&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;/body&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;body&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;ol&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;li&gt;リスト1<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;/li&gt;&lt;li&gt;リスト&lt;b&gt;2<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;/b&gt;&lt;/li&gt;&lt;li&gt;リスト3&lt;/li&gt;あ<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;/ol&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;b&gt;&lt;li&gt;何もしない&lt;/li&gt;&lt;/b&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;/body&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr><td colspan="3" class="desc err"> 5, 1: E0008:要素を適切と思われる位置に移動しました: &lt;li&gt;<br/> 4, 1: E0004:閉じられていない要素: &lt;li&gt;<br/> 6, 1: E0008:要素を適切と思われる位置に移動しました: &lt;b&gt;<br/> 5, 8: E0004:閉じられていない要素: &lt;b&gt;<br/> 5, 1: E0004:閉じられていない要素: &lt;li&gt;<br/> 8, 4: E0004:閉じられていない要素: &lt;li&gt;</td></tr>
+<tr class="odd"><td colspan="3" class="titl">○<i>p:閉じられていないパラグラフ要素</i></td></tr>
+<tr class="odd"><td colspan="3" class="desc">適切な位置へ移動(オプション動作)</td></tr>
+<tr class="odd">
+	<td class="smpl">&lt;html&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;body&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;p&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>あいうえお<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;p&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>かきくけこ<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;p&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>さしすせそ<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;/body&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+	<td style="font-size:10px;vertical-align:top;">→</td>
+	<td class="smpl">&lt;html&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;body&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;p&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>あいうえお<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;/p&gt;&lt;p&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>かきくけこ<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;/p&gt;&lt;p&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>さしすせそ<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;/p&gt;&lt;/body&gt;<img src="ctrl/0a.png" alt="" title="LF" class="ctrl"/><br/>&lt;/html&gt;<img src="ctrl/eof.png" alt="" title="EOF" class="ctrl"/></td>
+</tr>
+<tr class="odd"><td colspan="3" class="desc err"> 5, 1: E0008:要素を適切と思われる位置に移動しました: &lt;p&gt;<br/> 3, 1: E0004:閉じられていない要素: &lt;p&gt;<br/> 7, 1: E0008:要素を適切と思われる位置に移動しました: &lt;p&gt;<br/> 5, 1: E0004:閉じられていない要素: &lt;p&gt;<br/> 7, 1: E0004:閉じられていない要素: &lt;p&gt;</td></tr>
+</table>
+</body>
+</html>

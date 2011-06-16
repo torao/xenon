@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html-parse-spec [
+	<!ENTITY cr "&#x0D;">
+	<!ENTITY lf "&#x0A;">
+	<!ENTITY crlf "&#x0D;&#x0A;">
+	<!ENTITY ht "	">
+]>
+<section id="comment">
+	<title>コメントの解釈</title>
+	<spec>
+		<title>通常のコメント</title>
+		<desc>XMLのコメントとして解釈</desc>
+		<expected><![CDATA[<html><!-- コメント --></html>]]></expected>
+		<sample><![CDATA[<html><!-- コメント --></html>]]></sample>
+	</spec>
+	<spec>
+		<title>空のコメント</title>
+		<desc>XMLのコメントとして解釈</desc>
+		<expected><![CDATA[<html><!----></html>]]></expected>
+		<sample><![CDATA[<html><!----></html>]]></sample>
+	</spec>
+	<spec>
+		<title>ドキュメント要素より前のコメント</title>
+		<desc>XMLのコメントとして解釈</desc>
+		<expected><![CDATA[<!--コメント--><html/>]]></expected>
+		<sample><![CDATA[<!--コメント--><html/>]]></sample>
+	</spec>
+	<spec>
+		<title>ドキュメント要素より後のコメント</title>
+		<desc>XMLのコメントとして解釈</desc>
+		<expected><![CDATA[<html/><!--コメント-->]]></expected>
+		<sample><![CDATA[<html/><!--コメント-->]]></sample>
+	</spec>
+	<spec>
+		<title>連続したハイフンを内包するコメント</title>
+		<desc>そのままハンドラへ通知 (DOM実装で空白を挿入)</desc>
+		<error>C0001</error>
+		<expected><![CDATA[<html><!-- i- - --></html>]]></expected>
+		<sample><![CDATA[<html><!-- i-- --></html>]]></sample>
+	</spec>
+	<spec>
+		<title>ハイフンで終了するコメント</title>
+		<desc>そのままハンドラへ通知 (DOM実装で空白を挿入)</desc>
+		<error>C0001</error>
+		<expected><![CDATA[<html><!--- --></html>]]></expected>
+		<sample><![CDATA[<html><!-----></html>]]></sample>
+	</spec>
+</section>

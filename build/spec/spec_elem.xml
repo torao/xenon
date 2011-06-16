@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html-parse-spec [
+	<!ENTITY cr "&#x0D;">
+	<!ENTITY lf "&#x0A;">
+	<!ENTITY crlf "&#x0D;&#x0A;">
+	<!ENTITY ht "	">
+]>
+<section id="element">
+	<title>要素</title>
+	<spec>
+		<title>子要素を内包しない要素</title>
+		<desc>空の要素として認識</desc>
+		<expected><![CDATA[<html><div/></html>]]></expected>
+		<sample><![CDATA[<html><div></div></html>]]></sample>
+	</spec>
+	<spec>
+		<title>子要素を内包しない要素(簡略表記)</title>
+		<desc>空の要素として認識</desc>
+		<expected><![CDATA[<html><div/></html>]]></expected>
+		<sample><![CDATA[<html><div/></html>]]></sample>
+	</spec>
+	<spec>
+		<title>要素内の意味を持たない空白文字</title>
+		<desc>無視</desc>
+		<expected><![CDATA[<html/>]]></expected>
+		<sample>&lt;html&ht;  &cr; &lf;/&gt;</sample>
+	</spec>
+	<spec>
+		<title>使用していない要素終了</title>
+		<desc>警告して無視</desc>
+		<error>E0002</error>
+		<expected><![CDATA[<html>あいうえお</html>]]></expected>
+		<sample>&lt;html&gt;あいう&lt;/b&gt;えお&lt;/html&gt;</sample>
+	</spec>
+	<spec>
+		<title>要素の終了に属性を記述</title>
+		<desc>警告して無視</desc>
+		<error>E0001</error>
+		<expected><![CDATA[<html>あいうえお</html>]]></expected>
+		<sample>&lt;html&gt;あいうえお&lt;/html class="foo"&gt;</sample>
+	</spec>
+</section>

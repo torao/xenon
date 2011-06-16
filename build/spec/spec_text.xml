@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html-parse-spec [
+	<!ENTITY cr "&#x0D;">
+	<!ENTITY lf "&#x0A;">
+	<!ENTITY crlf "&#x0D;&#x0A;">
+	<!ENTITY ht "	">
+]>
+<section id="text">
+	<title>テキストの解釈</title>
+	<spec>
+		<title>通常のテキスト</title>
+		<desc>テキストとして解釈</desc>
+		<expected><![CDATA[<html>あいうえお</html>]]></expected>
+		<sample><![CDATA[<html>あいうえお</html>]]></sample>
+	</spec>
+	<spec>
+		<title>XML定義の空白文字</title>
+		<desc>単体のCRは改行としてLFに変換</desc>
+		<expected><![CDATA[<html>[ ][	][]]>&#x0a;<![CDATA[][]]>&#x0a;<![CDATA[]</html>]]></expected>
+		<sample><![CDATA[<html>[ ][	][]]>&#x0d;<![CDATA[][]]>&#x0a;<![CDATA[]</html>]]></sample>
+	</spec>
+	<spec>
+		<title>改行文字の扱い</title>
+		<desc>CRLF及び単体のCRはLFに変換</desc>
+		<expected><![CDATA[<html>]]>[&#x0a;][&#x0a;][&#x0a;]<![CDATA[</html>]]></expected>
+		<sample><![CDATA[<html>]]>[&#x0a;][&#x0d;&#x0a;][&#x0d;]<![CDATA[</html>]]></sample>
+	</spec>
+	<spec>
+		<title>要素に囲まれていないテキスト</title>
+		<desc>暗黙的にHTML要素を開始</desc>
+		<expected><![CDATA[<html>あいうえお</html>]]></expected>
+		<sample loose="loose"><![CDATA[あいうえお]]></sample>
+	</spec>
+	<spec>
+		<title>単体の'&lt;'</title>
+		<desc>テキストとして解釈</desc>
+		<expected><![CDATA[<html>&lt;</html>]]></expected>
+		<sample loose="loose"><![CDATA[<]]></sample>
+	</spec>
+	<spec>
+		<title>単体の'&amp;'</title>
+		<desc>テキストとして解釈</desc>
+		<error>T0001</error>
+		<expected><![CDATA[<html>&amp;</html>]]></expected>
+		<sample><![CDATA[<html>&</html>]]></sample>
+	</spec>
+</section>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html-parse-spec [
+	<!ENTITY cr "&#x0D;">
+	<!ENTITY lf "&#x0A;">
+	<!ENTITY crlf "&#x0D;&#x0A;">
+	<!ENTITY ht "	">
+]>
+<section id="pi">
+	<title>処理命令の解釈</title>
+	<spec>
+		<title>ドキュメント要素より前に記述された処理命令</title>
+		<desc>XMLの処理命令として解釈</desc>
+		<expected>&lt;?xml version="1.0"?&gt;&lt;?xml-stylesheet type="text/xsl"?&gt;&lf;<![CDATA[<html/>]]></expected>
+		<sample>&lt;?xml-stylesheet type="text/xsl"?&gt;&lf;<![CDATA[<html/>]]></sample>
+	</spec>
+	<spec>
+		<title>ドキュメント内に記述された処理命令</title>
+		<desc>XMLの処理命令として解釈</desc>
+		<expected>&lt;?xml version="1.0"?&gt;<![CDATA[<html>]]>&lt;?xml-stylesheet type="text/xsl"?&gt;<![CDATA[</html>]]></expected>
+		<sample><![CDATA[<html>]]>&lt;?xml-stylesheet type="text/xsl"?&gt;<![CDATA[</html>]]></sample>
+	</spec>
+	<spec>
+		<title>ドキュメント終了より後に記述された処理命令</title>
+		<desc>XMLの処理命令として解釈</desc>
+		<expected>&lt;?xml version="1.0"?&gt;<![CDATA[<html/>]]>&lt;?xml-stylesheet type="text/xsl"?&gt;</expected>
+		<sample><![CDATA[<html/>]]>&lt;?xml-stylesheet type="text/xsl"?&gt;</sample>
+	</spec>
+	<spec>
+		<title>処理命令内の記述</title>
+		<desc>CR及びCRLFのみをLFに変換</desc>
+		<expected>&lt;?xml version="1.0"?&gt;<![CDATA[<html>]]>&lt;?foo  [ &ht;A &cr;B &crlf;C &lf;D &amp;amp; ] ?&gt;<![CDATA[</html>]]></expected>
+		<sample><![CDATA[<html>]]>&lt;?foo  [ &ht;A &cr;B &crlf;C &lf;D &amp;amp; ] ?&gt;<![CDATA[</html>]]></sample>
+	</spec>
+	<spec>
+		<title>無効な処理命令のターゲット名</title>
+		<desc>警告して無視</desc>
+		<error>P0001</error>
+		<expected>&lt;?xml version="1.0"?&gt;<![CDATA[<html/>]]></expected>
+		<sample><![CDATA[<html>]]>&lt;??&gt;<![CDATA[</html>]]></sample>
+	</spec>
+	<spec>
+		<title>無効な処理命令のターゲット名</title>
+		<desc>警告して無視</desc>
+		<error>P0001</error>
+		<expected>&lt;?xml version="1.0"?&gt;<![CDATA[<html/>]]></expected>
+		<sample><![CDATA[<html>]]>&lt;? ?&gt;<![CDATA[</html>]]></sample>
+	</spec>
+	<spec>
+		<title>無効な処理命令のターゲット名</title>
+		<desc>警告して無視</desc>
+		<error>P0001</error>
+		<expected>&lt;?xml version="1.0"?&gt;<![CDATA[<html/>]]></expected>
+		<sample><![CDATA[<html>]]>&lt;? foo="bar"?&gt;<![CDATA[</html>]]></sample>
+	</spec>
+	<spec>
+		<title>無効な処理命令のターゲット名</title>
+		<desc>警告して無視</desc>
+		<error>P0001</error>
+		<expected>&lt;?xml version="1.0"?&gt;<![CDATA[<html/>]]></expected>
+		<sample><![CDATA[<html>]]>&lt;?--?&gt;<![CDATA[</html>]]></sample>
+	</spec>
+</section>

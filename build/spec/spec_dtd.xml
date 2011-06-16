@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html-parse-spec [
+	<!ENTITY cr "&#x0D;">
+	<!ENTITY lf "&#x0A;">
+	<!ENTITY crlf "&#x0D;&#x0A;">
+	<!ENTITY ht "	">
+]>
+<section id="dtd">
+	<title>ドキュメント宣言の解釈</title>
+	<spec>
+		<title>PUBLIC IDの記述(SYSTEM ID付属)</title>
+		<desc>DTDHandlerへ通知のみ</desc>
+		<expected><![CDATA[<html/>]]></expected>
+		<sample><![CDATA[<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">]]>&lf;<![CDATA[<html/>]]></sample>
+	</spec>
+	<spec>
+		<title>PUBLIC IDの記述(SYSTEM ID省略)</title>
+		<desc>DTDHandlerへ通知のみ</desc>
+		<expected><![CDATA[<html/>]]></expected>
+		<sample><![CDATA[<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">]]>&lf;<![CDATA[<html/>]]></sample>
+	</spec>
+	<spec>
+		<title>SYSTEM IDの記述</title>
+		<desc>DTDHandlerへ通知のみ</desc>
+		<expected><![CDATA[<html/>]]></expected>
+		<sample><![CDATA[<!DOCTYPE html SYSTEM "http://www.w3.org/TR/html4/strict.dtd">]]>&lf;<![CDATA[<html/>]]></sample>
+	</spec>
+	<spec>
+		<title>PUBLID ID/SYSTEM ID共に記述</title>
+		<desc>DTDHandlerへ通知のみ</desc>
+		<expected><![CDATA[<html/>]]></expected>
+		<sample><![CDATA[<!DOCTYPE html>]]>&lf;<![CDATA[<html/>]]></sample>
+	</spec>
+	<spec>
+		<title>html以外のDTD</title>
+		<desc>DTDHandlerへ通知のみ</desc>
+		<expected><![CDATA[<html/>]]></expected>
+		<sample><![CDATA[<!DOCTYPE xhtml PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">]]>&lf;<![CDATA[<html/>]]></sample>
+	</spec>
+	<spec>
+		<title>認識できないDTD</title>
+		<desc>無視</desc>
+		<error>D0001</error>
+		<expected><![CDATA[<html/>]]></expected>
+		<sample><![CDATA[<!DOCTYPE html PRIVATE "http://www.w3.org/TR/html4/strict.dtd">]]>&lf;<![CDATA[<html/>]]></sample>
+	</spec>
+</section>

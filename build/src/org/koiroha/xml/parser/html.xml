@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html-tag>
+	<!-- html tag definition -->
+	<tag name="a" style="decoration" />
+	<tag name="abbr" style="decoration" />
+	<tag name="acronym" style="decoration" />
+	<tag name="address" style="decoration" />
+	<tag name="area" parent="map" style="empty" />
+	<tag name="b" style="decoration" />
+	<tag name="base" parent="head" style="empty" />
+	<tag name="basefont" style="empty" />
+	<tag name="bdo" />
+	<tag name="bgsound" parent="head" style="empty" />
+	<tag name="big" style="decoration" />
+	<tag name="blink" style="decoration" />
+	<tag name="blockquote" />
+	<tag name="body" parent="html noframes" />
+	<tag name="br" style="empty" />
+	<tag name="caption" parent="table" />
+	<tag name="center" />
+	<tag name="cite" style="decoration" />
+	<tag name="code" style="decoration" />
+	<tag name="col" parent="colgroup table" style="empty" />
+	<tag name="colgroup" parent="table" />
+	<tag name="dd" parent="dl" />
+	<tag name="del" style="decoration" />
+	<tag name="dfn" style="decoration" />
+	<tag name="dir" />
+	<tag name="div" />
+	<tag name="dl" />
+	<tag name="dt" parent="dl" />
+	<tag name="em" style="decoration" />
+	<tag name="embed" style="empty" />
+	<tag name="frame" parent="frameset" style="empty" />
+	<tag name="frameset" parent="html" />
+	<tag name="font" style="decoration" />
+	<tag name="form" />
+	<tag name="h1" />
+	<tag name="h2" />
+	<tag name="h3" />
+	<tag name="h4" />
+	<tag name="h5" />
+	<tag name="h6" />
+	<tag name="head" parent="html" />
+	<tag name="html" />
+	<tag name="hr" style="empty" />
+	<tag name="i" style="decoration" />
+	<tag name="img" style="empty" />
+	<tag name="input" style="empty" />
+	<tag name="isindex" style="empty" />
+	<tag name="legend" parent="fieldset" />
+	<tag name="li" parent="ol ul menu dir" />
+	<tag name="link" parent="decoration" style="empty" />
+	<tag name="listing" />
+	<tag name="ins" style="decoration" />
+	<tag name="kbd" style="decoration" />
+	<tag name="marquee" />
+	<tag name="menu" />
+	<tag name="meta" parent="head" style="empty" />
+	<tag name="noembed" />
+	<tag name="noframes" parent="frameset" />
+	<tag name="noscript" />
+	<tag name="object" />
+	<tag name="ol" />
+	<tag name="option" parent="select optgroup" />
+	<tag name="p" />
+	<tag name="param" parent="applet object" style="empty" />
+	<tag name="plaintext" />
+	<tag name="pre" />
+	<tag name="q" style="decoration" />
+	<tag name="rb" parent="ruby" style="decoration" />
+	<tag name="rp" parent="ruby" style="decoration" />
+	<tag name="rt" parent="ruby" style="decoration" />
+	<tag name="ruby" style="decoration" />
+	<tag name="s" style="decoration" />
+	<tag name="samp" style="decoration" />
+	<tag name="small" style="decoration" />
+	<tag name="span" style="decoration" />
+	<tag name="strike" style="decoration" />
+	<tag name="strong" style="decoration" />
+	<tag name="sub" style="decoration" />
+	<tag name="sup" style="decoration" />
+	<tag name="tbody" parent="table" />
+	<tag name="td" parent="tr" />
+	<tag name="tfoot" parent="table" />
+	<tag name="th" parent="tr" />
+	<tag name="thead" parent="table" />
+	<tag name="title" parent="head" />
+	<tag name="tr" parent="table tbody tfoot thead" />
+	<tag name="tt" style="decoration" />
+	<tag name="spacer" style="empty" />
+	<tag name="u" style="decoration" />
+	<tag name="ul" />
+	<tag name="var" style="decoration" />
+	<tag name="wbr" style="empty" />
+	<tag name="xmp" />
+</html-tag>

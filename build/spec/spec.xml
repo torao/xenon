@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html-parse-spec [
+	<!ENTITY cr "&#x0D;">
+	<!ENTITY lf "&#x0A;">
+	<!ENTITY crlf "&#x0D;&#x0A;">
+	<!ENTITY ht "	">
+]>
+<html-parse-spec xmlns:xi="http://www.w3.org/2001/XInclude">
+	<!-- ================================================================ -->
+	<xi:include parse="xml" href="spec_attr.xml" />
+	<xi:include parse="xml" href="spec_cdata.xml" />
+	<xi:include parse="xml" href="spec_comment.xml" />
+	<xi:include parse="xml" href="spec_dtd.xml" />
+	<xi:include parse="xml" href="spec_elem.xml" />
+	<xi:include parse="xml" href="spec_entity.xml" />
+	<xi:include parse="xml" href="spec_pi.xml" />
+	<xi:include parse="xml" href="spec_prol.xml" />
+	<xi:include parse="xml" href="spec_structure.xml" />
+	<xi:include parse="xml" href="spec_text.xml" />
+</html-parse-spec>

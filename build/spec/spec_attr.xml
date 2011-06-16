@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html-parse-spec [
+	<!ENTITY cr "&#x0D;">
+	<!ENTITY lf "&#x0A;">
+	<!ENTITY crlf "&#x0D;&#x0A;">
+	<!ENTITY ht "	">
+]>
+<section id="attr">
+	<title>要素属性の解釈</title>
+	<spec>
+		<title>'\"'を使用した属性値の記述</title>
+		<desc>囲まれた部分を属性値として認識</desc>
+		<expected><![CDATA[<html lang="ja"/>]]></expected>
+		<sample><![CDATA[<html lang="ja"/>]]></sample>
+	</spec>
+	<spec>
+		<title>'\''を使用した属性値の記述</title>
+		<desc>囲まれた部分を属性値として認識</desc>
+		<expected><![CDATA[<html lang="ja"/>]]></expected>
+		<sample><![CDATA[<html lang='ja'/>]]></sample>
+	</spec>
+	<spec>
+		<title>引用符で囲まない属性値の記述</title>
+		<desc>'='以後最初の非空白文字から次の空白文字(または要素内終了)までを属性値と認識</desc>
+		<expected><![CDATA[<html lang="ja"/>]]></expected>
+		<sample><![CDATA[<html lang=ja />]]></sample>
+	</spec>
+	<spec>
+		<title>引用符で囲まない属性値('/'が'&gt;'とつながっている)の記述</title>
+		<desc>空要素と認識しないことを確認</desc>
+		<expected><![CDATA[<html><a href="/">A</a></html>]]></expected>
+		<sample><![CDATA[<html><a href=/>A</a></html>]]></sample>
+	</spec>
+	<spec>
+		<title>属性値のダブルクォート中のシングルクォート</title>
+		<desc>区切りとして認識せず属性値の文字とすることを確認</desc>
+		<expected><![CDATA[<html title="a 'A' x"/>]]></expected>
+		<sample><![CDATA[<html title="a 'A' x"/>]]></sample>
+	</spec>
+	<spec>
+		<title>閉じられていないクォート</title>
+		<desc>属性値の一部として認識</desc>
+		<expected><![CDATA[<html lang="&quot;ja"/>]]></expected>
+		<sample><![CDATA[<html lang="ja />]]></sample>
+	</spec>
+	<spec>
+		<title>不正な属性の記述1</title>
+		<desc>警告して無視されることを確認</desc>
+		<error>E0009</error>
+		<expected><![CDATA[<html/>]]></expected>
+		<sample><![CDATA[<html =/>]]></sample>
+	</spec>
+	<spec>
+		<title>不正な属性の記述2</title>
+		<desc>警告して無視されることを確認</desc>
+		<error>E0009</error>
+		<expected><![CDATA[<html/>]]></expected>
+		<sample><![CDATA[<html =></html>]]></sample>
+	</spec>
+	<spec>
+		<title>不正な属性の記述</title>
+		<desc>警告して無視されることを確認</desc>
+		<error>E0009</error>
+		<expected><![CDATA[<html a="b"/>]]></expected>
+		<sample><![CDATA[<html a="b" =/>]]></sample>
+	</spec>
+	<spec>
+		<title>同じ名前の属性が定義されている</title>
+		<desc>警告して後に定義された方が適用される事を確認</desc>
+		<error>E0010</error>
+		<expected><![CDATA[<html a="c"/>]]></expected>
+		<sample><![CDATA[<html a="b" a="c"/>]]></sample>
+	</spec>
+	<spec>
+		<title>属性値のシングルクォート中のダブルクォート</title>
+		<desc>区切りとして認識せず属性値の文字とすることを確認</desc>
+		<expected><![CDATA[<html title="a &quot;A&quot; x"/>]]></expected>
+		<sample><![CDATA[<html title='a "A" x'/>]]></sample>
+	</spec>
+	<spec>
+		<title>値を省略した属性の記述</title>
+		<desc>属性名と同じ値を設定</desc>
+		<expected><![CDATA[<html mayscript="mayscript"/>]]></expected>
+		<sample><![CDATA[<html mayscript />]]></sample>
+	</spec>
+	<spec>
+		<title>要素内の実体参照</title>
+		<desc>対応するUnicode文字として認識</desc>
+		<expected><![CDATA[<html foo="&amp;&quot;"/>]]></expected>
+		<sample><![CDATA[<html foo="&amp;&quot;" />]]></sample>
+	</spec>
+</section>

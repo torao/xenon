@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html-parse-spec [
+	<!ENTITY cr "&#x0D;">
+	<!ENTITY lf "&#x0A;">
+	<!ENTITY crlf "&#x0D;&#x0A;">
+	<!ENTITY ht "	">
+]>
+<section id="cdata">
+	<title>CDATAセクションの解釈</title>
+	<spec>
+		<title>通常のCDATAセクション</title>
+		<desc>エスケープされていないテキストとして解釈(改行のみ変換)</desc>
+		<expected><![CDATA[<html>]]>&lt;![CDATA[&lf;&ht;&lt; &gt; &amp; &quot; &cr; &crlf;]]&gt;<![CDATA[</html>]]></expected>
+		<sample><![CDATA[<html>]]>&lt;![CDATA[&lf;&ht;&lt; &gt; &amp; &quot; &cr; &crlf;]]&gt;<![CDATA[</html>]]></sample>
+	</spec>
+	<spec>
+		<title>単体のCDATAセクション</title>
+		<desc>暗黙的にhtml要素を開始</desc>
+		<expected><![CDATA[<html>]]>&lt;![CDATA[ ABC ]]&gt;<![CDATA[</html>]]></expected>
+		<sample>&lt;![CDATA[ ABC ]]&gt;</sample>
+	</spec>
+	<spec>
+		<title>ドキュメント要素より前のCDATAセクション</title>
+		<desc>html要素内に内包</desc>
+		<expected><![CDATA[<html>]]>&lt;![CDATA[ あいうえお ]]&gt; かきくけこ<![CDATA[</html>]]></expected>
+		<sample> &lt;![CDATA[ あいうえお ]]&gt; <![CDATA[<html>かきくけこ</html>]]></sample>
+	</spec>
+	<spec>
+		<title>ドキュメント要素より後のCDATAセクション</title>
+		<desc>html要素内に内包</desc>
+		<expected><![CDATA[<html>]]>あいうえお &lt;![CDATA[ かきくけこ ]]&gt;<![CDATA[</html>]]></expected>
+		<sample><![CDATA[<html>あいうえお</html>]]> &lt;![CDATA[ かきくけこ ]]&gt; </sample>
+	</spec>
+</section>
