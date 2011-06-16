@@ -4,9 +4,9 @@ default file encoding  : UTF-8
 default line separator : LF ('\n')
 target java environment: Java2 SE 5.0
 additional libraries   : -
-project id             : xmllib
+project id             : xenon
 
-
+--- History ---
 2010/02/25
  o Java2 SE 5.0 対応
  o Xerces 2.9 バグ回避対応
