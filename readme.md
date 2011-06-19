@@ -16,10 +16,12 @@ this recognize well-formed XML same as JAXP.
 
 # Feature
 
-* Build DOM from HTML or loose, imcomplete XML.
 * Compatible to use for JAXP.
+* Build DOM from HTML or loose, incomplete XML.
+* Callback based parsing is same as SAX, too.
 * Guess charset from &lt;?xml?&gt; or &lt;meta&gt; element in XML/HTML.
-* Callback based parsing same as SAX, too.
+* Any SAXException are not arisen in parsing. But when uses HTMLDocumentBuilderFactory,
+ErrorHandler.warning() is called to report incomplete xml format.
 
 Note that the SAX feature is faithfulness for loose structure. It means that the all callback will
 not be based on JAXP specification. For example, asymmetric begin-end callback will occur for
@@ -30,6 +32,7 @@ you will use valid-XML parser or validate DOM after building.
 
 # History
 2010/02/25
+
 * Java2 SE 5.0 対応
 * Xerces 2.9 バグ回避対応
 * クォートで囲まれていない属性値の最後がスラッシュで終わっておりその直後に要素の終了が存在する場合について、空要素と
