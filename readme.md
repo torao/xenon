@@ -1,5 +1,9 @@
-Propject Property Information
+# Introduction
+Xenon 
 
+# Properties of This Project
+
+Xenon is provided as Eclipse project with default file encoding UTF-8 and line separator '\n'.
 default file encoding  : UTF-8
 default line separator : LF ('\n')
 target java environment: Java2 SE 5.0
