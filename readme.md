@@ -1,14 +1,34 @@
 # Introduction
-Xenon 
+Xenon is a library that provides the future to parse loose or imcomplete XML including HTML and
+build DOM to your application. You can use almost in the same way with JAXP.
 
-# Properties of This Project
+	String factoryName = "org.koiroha.xml.parser.HTMLDocumentBuilderFactory";
+	DocumentBuilderFactory factory
+	    = DocumentBuilderFactory.newInstance(factoryName, loader);
+	DocumentBuilder builder = factory.newDocumentBuilder();
+	Document doc = builder.parse(htmlFile);
 
-Xenon is provided as Eclipse project with default file encoding UTF-8 and line separator '\n'.
-default file encoding  : UTF-8
-default line separator : LF ('\n')
-target java environment: Java2 SE 5.0
-additional libraries   : -
-project id             : xenon
+or more shortly
+
+	DocumentBuilderFactory factory = new HTMLDocumentBuilderFactory();
+	DocumentBuilder builder = factory.newDocumentBuilder();
+	Document doc = builder.parse(htmlFile);
+
+This library includes type 2 SAX parser and level 3 DOM builder for loose XML and HTML. Of course
+this recognize well-formed XML same as JAXP.
+
+* Runtime Environment: Java2 SE 5.0 or later
+* Additional Library: none
+* Project Properties: Eclipse 3.6. standard file encoding is UTF-8, and line separator is LF.
+* License: Apache License, Version 2.0
+
+# Feature
+
+* Build DOM from HTML or loose, imcomplete XML.
+* Compatible to use for JAXP.
+* Guess charset from &lt;?xml?&gt; or &lt;meta&gt; element in XML/HTML.
+* Callback based parsing same as SAX (but it is faithfulness for loose structure, so begin-end
+callback of element is asymmetric).
 
 --- History ---
 2010/02/25
