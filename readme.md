@@ -16,7 +16,7 @@ this recognize well-formed XML same as JAXP.
 
 # Feature
 
-* Compatible to use for JAXP.
+* Compatible to use for JAXP 1.3.
 * Build DOM from HTML or loose, incomplete XML.
 * Callback based parsing is same as SAX, too.
 * Guess charset from &lt;?xml?&gt; or &lt;meta&gt; element in XML/HTML.
